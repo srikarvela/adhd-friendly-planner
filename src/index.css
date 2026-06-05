@@ -1,0 +1,115 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── SF Pro Font Faces ─────────────────────────────────────────────────── */
+@font-face { font-family: 'SF Pro Display'; src: url('/fonts/SF-Pro-Display-Ultralight.otf') format('opentype'); font-weight: 100; font-style: normal; }
+@font-face { font-family: 'SF Pro Display'; src: url('/fonts/SF-Pro-Display-Thin.otf') format('opentype'); font-weight: 200; font-style: normal; }
+@font-face { font-family: 'SF Pro Display'; src: url('/fonts/SF-Pro-Display-Light.otf') format('opentype'); font-weight: 300; font-style: normal; }
+@font-face { font-family: 'SF Pro Display'; src: url('/fonts/SF-Pro-Display-Regular.otf') format('opentype'); font-weight: 400; font-style: normal; }
+@font-face { font-family: 'SF Pro Display'; src: url('/fonts/SF-Pro-Display-Medium.otf') format('opentype'); font-weight: 500; font-style: normal; }
+@font-face { font-family: 'SF Pro Display'; src: url('/fonts/SF-Pro-Display-Semibold.otf') format('opentype'); font-weight: 600; font-style: normal; }
+@font-face { font-family: 'SF Pro Display'; src: url('/fonts/SF-Pro-Display-Bold.otf') format('opentype'); font-weight: 700; font-style: normal; }
+@font-face { font-family: 'SF Pro Display'; src: url('/fonts/SF-Pro-Display-Heavy.otf') format('opentype'); font-weight: 800; font-style: normal; }
+@font-face { font-family: 'SF Pro Display'; src: url('/fonts/SF-Pro-Display-Black.otf') format('opentype'); font-weight: 900; font-style: normal; }
+
+@font-face { font-family: 'SF Pro Text'; src: url('/fonts/SF-Pro-Text-Light.otf') format('opentype'); font-weight: 300; font-style: normal; }
+@font-face { font-family: 'SF Pro Text'; src: url('/fonts/SF-Pro-Text-Regular.otf') format('opentype'); font-weight: 400; font-style: normal; }
+@font-face { font-family: 'SF Pro Text'; src: url('/fonts/SF-Pro-Text-Medium.otf') format('opentype'); font-weight: 500; font-style: normal; }
+@font-face { font-family: 'SF Pro Text'; src: url('/fonts/SF-Pro-Text-Semibold.otf') format('opentype'); font-weight: 600; font-style: normal; }
+@font-face { font-family: 'SF Pro Text'; src: url('/fonts/SF-Pro-Text-Bold.otf') format('opentype'); font-weight: 700; font-style: normal; }
+@font-face { font-family: 'SF Pro Text'; src: url('/fonts/SF-Pro-Text-Heavy.otf') format('opentype'); font-weight: 800; font-style: normal; }
+
+@font-face { font-family: 'SF Pro Rounded'; src: url('/fonts/SF-Pro-Rounded-Regular.otf') format('opentype'); font-weight: 400; font-style: normal; }
+@font-face { font-family: 'SF Pro Rounded'; src: url('/fonts/SF-Pro-Rounded-Medium.otf') format('opentype'); font-weight: 500; font-style: normal; }
+@font-face { font-family: 'SF Pro Rounded'; src: url('/fonts/SF-Pro-Rounded-Semibold.otf') format('opentype'); font-weight: 600; font-style: normal; }
+@font-face { font-family: 'SF Pro Rounded'; src: url('/fonts/SF-Pro-Rounded-Bold.otf') format('opentype'); font-weight: 700; font-style: normal; }
+@font-face { font-family: 'SF Pro Rounded'; src: url('/fonts/SF-Pro-Rounded-Heavy.otf') format('opentype'); font-weight: 800; font-style: normal; }
+@font-face { font-family: 'SF Pro Rounded'; src: url('/fonts/SF-Pro-Rounded-Black.otf') format('opentype'); font-weight: 900; font-style: normal; }
+
+/* ── Base ──────────────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  background-color: #000;
+  color: #fff;
+}
+
+body {
+  font-family: 'SF Pro Text', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ── Liquid Glass ──────────────────────────────────────────────────────── */
+.glass {
+  background: rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+    0 8px 32px rgba(0, 0, 0, 0.45);
+}
+
+/* blue-tinted glass (active day, active tabs) */
+.glass-blue {
+  background: rgba(10, 132, 255, 0.22);
+  backdrop-filter: blur(24px) saturate(200%);
+  -webkit-backdrop-filter: blur(24px) saturate(200%);
+  border: 1px solid rgba(10, 132, 255, 0.45);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.15),
+    0 4px 20px rgba(10, 132, 255, 0.28);
+}
+
+/* sheet / modal glass */
+.glass-sheet {
+  background: rgba(28, 28, 30, 0.82);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  border-top: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+/* ── Scrollbar ─────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { display: none; }
+
+/* ── Drag ghost ────────────────────────────────────────────────────────── */
+.dragging-ghost {
+  opacity: 0.4;
+  transform: scale(0.97);
+}
+
+.drag-overlay {
+  transform: scale(1.03) rotate(0.8deg);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.6) !important;
+  opacity: 1;
+}
+
+/* ── Range input (unused for now) ─────────────────────────────────────── */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  border-radius: 2px;
+  outline: none;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+}
+
+/* ── Safe areas ────────────────────────────────────────────────────────── */
+.safe-top    { padding-top: env(safe-area-inset-top); }
+.safe-bottom { padding-bottom: max(env(safe-area-inset-bottom), 16px); }
