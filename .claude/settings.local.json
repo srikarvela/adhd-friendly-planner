@@ -9,7 +9,15 @@
       "Bash(ln -sf /Users/srikarvelavarthipati/EE/Web/adhd-friendly-planner/fonts /Users/srikarvelavarthipati/EE/Web/adhd-friendly-planner/public/fonts)",
       "Bash(git init *)",
       "Bash(git add *)",
-      "Bash(git rm *)"
+      "Bash(git rm *)",
+      "Bash(git branch *)",
+      "Bash(git commit -m ' *)",
+      "Bash(gh auth *)",
+      "Bash(gh pr *)",
+      "mcp__Claude_in_Chrome__computer",
+      "Bash(git commit -m 'Add custom task input to Personal section *)",
+      "Bash(git push *)",
+      "Bash(git commit -m 'Right-click context menu to delete any task; custom personal task add *)"
     ]
   }
 }

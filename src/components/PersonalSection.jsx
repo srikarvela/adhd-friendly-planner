@@ -2,12 +2,19 @@ import { useState } from 'react'
 import { PERSONAL_BACKLOG, CATEGORIES } from '../data/defaultTasks'
 import { SortableList } from './SortableList'
 import InlineAdd from './InlineAdd'
+import ContextMenu from './ContextMenu'
 
 function PersonalTask({ task, onUpdate, onRemove, onMoveToTomorrow, dragHandleProps }) {
   const [expanded, setExpanded] = useState(false)
+  const [ctx, setCtx] = useState(null)
   const cat = CATEGORIES.personal
   return (
-    <div className="rounded-2xl mb-2 overflow-hidden" style={{ backgroundColor: task.done ? 'rgba(44,44,46,0.6)' : cat.bg, border: `1px solid ${task.done ? 'rgba(84,84,88,0.4)' : cat.border}`, boxShadow: task.done ? 'none' : '0 2px 8px rgba(0,0,0,0.25)' }}>
+    <div
+      className="rounded-2xl mb-2 overflow-hidden"
+      style={{ backgroundColor: task.done ? 'rgba(44,44,46,0.6)' : cat.bg, border: `1px solid ${task.done ? 'rgba(84,84,88,0.4)' : cat.border}`, boxShadow: task.done ? 'none' : '0 2px 8px rgba(0,0,0,0.25)' }}
+      onContextMenu={e => { e.preventDefault(); setCtx({ x: e.clientX, y: e.clientY }) }}
+    >
+      {ctx && <ContextMenu x={ctx.x} y={ctx.y} onDelete={onRemove} onClose={() => setCtx(null)} />}
       <div className="flex items-center gap-2 pr-3.5 pl-1.5 py-2.5">
         {dragHandleProps?.dragHandleProps && (
           <div {...dragHandleProps.dragHandleProps} className="flex-shrink-0 flex flex-col gap-[3px] justify-center px-1 py-2 cursor-grab active:cursor-grabbing touch-none" style={{ opacity: 0.28 }}>

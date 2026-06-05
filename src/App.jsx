@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, Fragment } from 'react'
+import ContextMenu from './components/ContextMenu'
 import { usePlanner } from './hooks/usePlanner'
 import { useAutoAI } from './hooks/useAutoAI'
 import { CATEGORIES, OBLIGATIONS, todayStr, tomorrowStr, dayName } from './data/defaultTasks'
@@ -68,6 +69,26 @@ function UnavailableScreen() {
           {hrs}h {mins}m away
         </p>
       )}
+    </div>
+  )
+}
+
+function BreakfastItem({ item, cat, onToggle, onRemove }) {
+  const [ctx, setCtx] = useState(null)
+  return (
+    <div
+      className="rounded-2xl mb-2 overflow-hidden"
+      style={{ backgroundColor: item.done ? 'rgba(44,44,46,0.6)' : cat.bg, border: `1px solid ${item.done ? 'rgba(84,84,88,0.4)' : cat.border}`, boxShadow: item.done ? 'none' : '0 2px 8px rgba(0,0,0,0.25)' }}
+      onContextMenu={e => { e.preventDefault(); setCtx({ x: e.clientX, y: e.clientY }) }}
+    >
+      {ctx && <ContextMenu x={ctx.x} y={ctx.y} onDelete={onRemove} onClose={() => setCtx(null)} />}
+      <div className="flex items-center gap-3 pr-3.5 pl-3.5 py-2.5">
+        <button onClick={onToggle} className="w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 active:scale-90" style={{ borderColor: item.done ? cat.color : cat.color + '55', backgroundColor: item.done ? cat.color : 'transparent' }}>
+          {item.done && <svg width="11" height="8" viewBox="0 0 11 8" fill="none"><path d="M1 3.5L4 6.5L10 1" stroke="white" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+        </button>
+        <p className="flex-1 text-[15px] font-medium" style={{ fontFamily: 'SF Pro Text, sans-serif', color: item.done ? 'rgba(235,235,245,0.3)' : 'rgba(255,255,255,0.92)', textDecoration: item.done ? 'line-through' : 'none' }}>{item.title}</p>
+        <button onClick={onRemove} className="text-[14px]" style={{ color: 'rgba(235,235,245,0.2)' }}>✕</button>
+      </div>
     </div>
   )
 }
@@ -239,7 +260,7 @@ export default function App() {
               <TaskCard
                 task={task} dragHandleProps={dndProps}
                 onUpdate={p => updateTask(task.id, p)}
-                onRemove={task.templateId === null || task.carriedOver ? () => removeSectionTask(task.id) : null}
+                onRemove={() => removeSectionTask(task.id)}
                 onMoveToTomorrow={isMoveable(task) ? () => moveToNextDay('task', task) : null}
               />
             )}
@@ -259,7 +280,7 @@ export default function App() {
               <TaskCard
                 task={task} dragHandleProps={dndProps}
                 onUpdate={p => updateTask(task.id, p)}
-                onRemove={task.templateId === null ? () => removeSectionTask(task.id) : null}
+                onRemove={() => removeSectionTask(task.id)}
                 onMoveToTomorrow={() => moveToNextDay('task', task)}
               />
             )}
@@ -284,15 +305,11 @@ export default function App() {
           {day.breakfast.map(item => {
             const cat = CATEGORIES.routine
             return (
-              <div key={item.id} className="rounded-2xl mb-2 overflow-hidden" style={{ backgroundColor: item.done ? 'rgba(44,44,46,0.6)' : cat.bg, border: `1px solid ${item.done ? 'rgba(84,84,88,0.4)' : cat.border}`, boxShadow: item.done ? 'none' : '0 2px 8px rgba(0,0,0,0.25)' }}>
-                <div className="flex items-center gap-3 pr-3.5 pl-3.5 py-2.5">
-                  <button onClick={() => toggleBreakfastItem(item.id)} className="w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 active:scale-90" style={{ borderColor: item.done ? cat.color : cat.color + '55', backgroundColor: item.done ? cat.color : 'transparent' }}>
-                    {item.done && <svg width="11" height="8" viewBox="0 0 11 8" fill="none"><path d="M1 3.5L4 6.5L10 1" stroke="white" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"/></svg>}
-                  </button>
-                  <p className="flex-1 text-[15px] font-medium" style={{ fontFamily: 'SF Pro Text, sans-serif', color: item.done ? 'rgba(235,235,245,0.3)' : 'rgba(255,255,255,0.92)', textDecoration: item.done ? 'line-through' : 'none' }}>{item.title}</p>
-                  <button onClick={() => removeBreakfastItem(item.id)} className="text-[14px]" style={{ color: 'rgba(235,235,245,0.2)' }}>✕</button>
-                </div>
-              </div>
+              <BreakfastItem
+                key={item.id} item={item} cat={cat}
+                onToggle={() => toggleBreakfastItem(item.id)}
+                onRemove={() => removeBreakfastItem(item.id)}
+              />
             )
           })}
           <InlineAdd placeholder="Add to breakfast…" onAdd={addBreakfastItem} accentColor="#FF8C55" />

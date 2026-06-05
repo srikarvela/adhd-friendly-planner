@@ -2,14 +2,18 @@ import { useState } from 'react'
 import { SCHOOL_CLASSES, CATEGORIES } from '../data/defaultTasks'
 import { SortableList } from './SortableList'
 import InlineAdd from './InlineAdd'
+import ContextMenu from './ContextMenu'
 
 function SchoolTask({ task, onUpdate, onRemove, onMoveToTomorrow, dragHandleProps }) {
+  const [ctx, setCtx] = useState(null)
   const cat = CATEGORIES.school
   return (
     <div
       className="rounded-2xl mb-2 overflow-hidden"
       style={{ backgroundColor: task.done ? 'rgba(44,44,46,0.6)' : cat.bg, border: `1px solid ${task.done ? 'rgba(84,84,88,0.4)' : cat.border}`, boxShadow: task.done ? 'none' : '0 2px 8px rgba(0,0,0,0.25)' }}
+      onContextMenu={e => { e.preventDefault(); setCtx({ x: e.clientX, y: e.clientY }) }}
     >
+      {ctx && <ContextMenu x={ctx.x} y={ctx.y} onDelete={onRemove} onClose={() => setCtx(null)} />}
       <div className="flex items-center gap-2 pr-3.5 pl-1.5 py-2.5">
         {dragHandleProps && (
           <div

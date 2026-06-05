@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { CATEGORIES } from '../data/defaultTasks'
+import ContextMenu from './ContextMenu'
 
 // Drag handle icon
 function DragHandle({ listeners, attributes }) {
@@ -21,6 +22,7 @@ function DragHandle({ listeners, attributes }) {
 
 export default function TaskCard({ task, onUpdate, onRemove, onMoveToTomorrow, dragHandleProps }) {
   const [expanded, setExpanded] = useState(false)
+  const [ctx, setCtx] = useState(null)
   const cat = CATEGORIES[task.category] || CATEGORIES.routine
   const hasSubtasks = task.subtasks && task.subtasks.length > 0
   const doneSubs = hasSubtasks ? task.subtaskProgress.filter(Boolean).length : 0
@@ -49,7 +51,11 @@ export default function TaskCard({ task, onUpdate, onRemove, onMoveToTomorrow, d
         border: `1px solid ${task.done ? 'rgba(84,84,88,0.4)' : cat.border}`,
         boxShadow: task.done ? 'none' : '0 2px 8px rgba(0,0,0,0.25)',
       }}
+      onContextMenu={e => { e.preventDefault(); setCtx({ x: e.clientX, y: e.clientY }) }}
     >
+      {ctx && onRemove && (
+        <ContextMenu x={ctx.x} y={ctx.y} onDelete={onRemove} onClose={() => setCtx(null)} />
+      )}
       <div className="flex items-center gap-2 pr-3.5 pl-1.5 py-2.5">
         {/* Drag handle */}
         {dragHandleProps && <DragHandle {...dragHandleProps} />}
