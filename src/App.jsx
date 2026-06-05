@@ -316,6 +316,7 @@ export default function App() {
         <PersonalSection
           personalTasks={day.personal || []}
           onAdd={addPersonalTask}
+          onAddCustom={title => addPersonalTask({ id: `custom-personal-${Date.now()}`, title, note: '', category: 'personal' })}
           onUpdate={updatePersonalTask}
           onRemove={removePersonalTask}
           onReorder={reorderPersonalTasks}

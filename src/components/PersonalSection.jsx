@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { PERSONAL_BACKLOG, CATEGORIES } from '../data/defaultTasks'
 import { SortableList } from './SortableList'
+import InlineAdd from './InlineAdd'
 
 function PersonalTask({ task, onUpdate, onRemove, onMoveToTomorrow, dragHandleProps }) {
   const [expanded, setExpanded] = useState(false)
@@ -44,7 +45,7 @@ function PersonalTask({ task, onUpdate, onRemove, onMoveToTomorrow, dragHandlePr
   )
 }
 
-export default function PersonalSection({ personalTasks, onAdd, onUpdate, onRemove, onReorder, onMoveToTomorrow }) {
+export default function PersonalSection({ personalTasks, onAdd, onAddCustom, onUpdate, onRemove, onReorder, onMoveToTomorrow }) {
   const [showBacklog, setShowBacklog] = useState(false)
   const cat = CATEGORIES.personal
   const activatedIds = new Set(personalTasks.map(t => t.templateId))
@@ -80,6 +81,12 @@ export default function PersonalSection({ personalTasks, onAdd, onUpdate, onRemo
           {showBacklog ? 'Hide project list' : 'Add from project list'}
         </span>
       </button>
+
+      <InlineAdd
+        placeholder="Add custom personal task…"
+        onAdd={title => onAddCustom && onAddCustom(title)}
+        accentColor={cat.color}
+      />
 
       {showBacklog && (
         <div className="rounded-2xl overflow-hidden mb-2" style={{ backgroundColor: 'rgba(28,28,30,0.95)', border: '1px solid rgba(255,255,255,0.09)' }}>
