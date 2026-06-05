@@ -1,11 +1,35 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef } from 'react'
 import { arrayMove } from '@dnd-kit/sortable'
 import { buildDayTasks, buildSchoolData, todayStr, tomorrowStr } from '../data/defaultTasks'
+import { supabase } from '../lib/supabase'
 
 const KEY = 'adhd_planner_v3'
 
 function load() { try { return JSON.parse(localStorage.getItem(KEY)) || {} } catch { return {} } }
-function save(d) { localStorage.setItem(KEY, JSON.stringify(d)) }
+function saveLocal(d) { localStorage.setItem(KEY, JSON.stringify(d)) }
+
+// Debounced Supabase upsert — waits 2s after last change before writing
+let syncTimer = null
+function scheduleSync(userId, data) {
+  if (!supabase || !userId) return
+  clearTimeout(syncTimer)
+  syncTimer = setTimeout(async () => {
+    try {
+      await supabase.from('user_data').upsert({
+        user_id: userId,
+        data,
+        updated_at: new Date().toISOString(),
+      })
+    } catch (e) {
+      console.warn('Supabase sync failed:', e)
+    }
+  }, 2000)
+}
+
+function save(d, userId) {
+  saveLocal(d)
+  scheduleSync(userId, d)
+}
 
 function ensureDay(store, dateStr) {
   if (store[dateStr]) return store
@@ -22,19 +46,46 @@ function ensureDay(store, dateStr) {
   }
 }
 
-export function usePlanner() {
+export function usePlanner(userId) {
   const [store, setStore] = useState(() => ensureDay(load(), todayStr()))
   const [activeDate, setActiveDateRaw] = useState(todayStr())
+  const [syncing, setSyncing] = useState(false)
+
+  // Pull from Supabase when userId becomes available
+  const pulled = useRef(false)
+  if (userId && !pulled.current && supabase) {
+    pulled.current = true
+    setSyncing(true)
+    supabase.from('user_data').select('data,updated_at').eq('user_id', userId).single()
+      .then(({ data: row }) => {
+        if (row?.data) {
+          // Merge: keep whichever day is newer (remote wins on conflict)
+          setStore(prev => {
+            const remote = row.data
+            const merged = { ...prev }
+            for (const date of Object.keys(remote)) {
+              // Always prefer remote since it came from another device
+              merged[date] = remote[date]
+            }
+            const withToday = ensureDay(merged, todayStr())
+            saveLocal(withToday)
+            return withToday
+          })
+        }
+        setSyncing(false)
+      })
+      .catch(() => setSyncing(false))
+  }
 
   function setActiveDate(d) {
-    setStore(prev => { const n = ensureDay(prev, d); save(n); return n })
+    setStore(prev => { const n = ensureDay(prev, d); save(n, userId); return n })
     setActiveDateRaw(d)
   }
 
-  const day = store[activeDate] || { tasks: [], school: {}, personal: [], breakfast: [] }
+  const day = store[activeDate] || { tasks: [], school: {}, personal: [], breakfast: [], notes: '', aiGenerated: false }
 
   function mut(fn) {
-    setStore(prev => { const n = fn(prev); save(n); return n })
+    setStore(prev => { const n = fn(prev); save(n, userId); return n })
   }
 
   // ── Section tasks (morning/prayer/meds/night/obligation) ────────────────
@@ -194,6 +245,6 @@ export function usePlanner() {
     addSchoolTask, updateSchoolTask, removeSchoolTask, reorderSchoolTasks,
     addPersonalTask, updatePersonalTask, removePersonalTask, reorderPersonalTasks,
     addBreakfastItem, toggleBreakfastItem, removeBreakfastItem,
-    injectAITasks, moveToNextDay, updateNotes,
+    injectAITasks, moveToNextDay, updateNotes, syncing,
   }
 }

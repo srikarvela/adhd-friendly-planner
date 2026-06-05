@@ -2,7 +2,9 @@ import { useState, useEffect, useRef, useCallback, Fragment } from 'react'
 import ContextMenu from './components/ContextMenu'
 import { usePlanner } from './hooks/usePlanner'
 import { useAutoAI } from './hooks/useAutoAI'
+import { useAuth } from './hooks/useAuth'
 import { CATEGORIES, OBLIGATIONS, todayStr, tomorrowStr, dayName } from './data/defaultTasks'
+import AuthScreen from './components/AuthScreen'
 import { SortableList } from './components/SortableList'
 import TaskCard from './components/TaskCard'
 import InlineAdd from './components/InlineAdd'
@@ -94,14 +96,34 @@ function BreakfastItem({ item, cat, onToggle, onRemove }) {
 }
 
 export default function App() {
+  const { session, signIn, signUp, signOut, resetPassword } = useAuth()
+
+  // session === undefined → still loading auth
+  if (session === undefined) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#000' }}>
+        <div className="w-8 h-8 rounded-full border-2 border-white/20 border-t-white/80 animate-spin" />
+      </div>
+    )
+  }
+
+  // Not logged in → show auth screen
+  if (!session) {
+    return <AuthScreen onSignIn={signIn} onSignUp={signUp} onReset={resetPassword} />
+  }
+
+  return <PlannerApp userId={session.user.id} userEmail={session.user.email} onSignOut={signOut} />
+}
+
+function PlannerApp({ userId, userEmail, onSignOut }) {
   const {
-    day, activeDate, setActiveDate, store,
+    day, activeDate, setActiveDate, store, syncing,
     updateTask, addSectionTask, removeSectionTask, reorderTasks,
     addSchoolTask, updateSchoolTask, removeSchoolTask, reorderSchoolTasks,
     addPersonalTask, updatePersonalTask, removePersonalTask, reorderPersonalTasks,
     addBreakfastItem, toggleBreakfastItem, removeBreakfastItem,
     injectAITasks, moveToNextDay, updateNotes,
-  } = usePlanner()
+  } = usePlanner(userId)
 
   const available = isDateAvailable(activeDate)
   const allDates = getAllDates()
@@ -154,11 +176,27 @@ export default function App() {
             >
               {formatDate(activeDate)}
             </h1>
-            <button
-              onClick={() => setShowAI(true)}
-              className="w-9 h-9 rounded-full flex items-center justify-center text-[17px]"
-              style={{ background: 'linear-gradient(135deg, #BF5AF2, #409CFF)', boxShadow: '0 4px 16px rgba(191,90,242,0.4)' }}
-            >✨</button>
+            <div className="flex items-center gap-2">
+              {/* Sync indicator */}
+              {syncing && (
+                <div className="w-4 h-4 rounded-full border-2 border-white/20 border-t-white/70 animate-spin" />
+              )}
+              {/* AI button */}
+              <button
+                onClick={() => setShowAI(true)}
+                className="w-9 h-9 rounded-full flex items-center justify-center text-[17px]"
+                style={{ background: 'linear-gradient(135deg, #BF5AF2, #409CFF)', boxShadow: '0 4px 16px rgba(191,90,242,0.4)' }}
+              >✨</button>
+              {/* User / sign-out */}
+              <button
+                onClick={onSignOut}
+                title={`Signed in as ${userEmail}\nTap to sign out`}
+                className="w-9 h-9 rounded-full flex items-center justify-center text-[13px] font-bold"
+                style={{ backgroundColor: 'rgba(255,255,255,0.10)', color: 'rgba(255,255,255,0.7)', border: '1px solid rgba(255,255,255,0.12)' }}
+              >
+                {userEmail?.[0]?.toUpperCase() ?? '?'}
+              </button>
+            </div>
           </div>
 
           {/* Progress bar */}
