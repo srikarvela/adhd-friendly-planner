@@ -6,3 +6,4 @@ dist/
 # Apple SF fonts are proprietary — serve locally only
 fonts/
 public/fonts
+.vercel

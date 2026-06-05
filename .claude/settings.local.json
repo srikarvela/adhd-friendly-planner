@@ -18,7 +18,10 @@
       "Bash(git commit -m 'Add custom task input to Personal section *)",
       "Bash(git push *)",
       "Bash(git commit -m 'Right-click context menu to delete any task; custom personal task add *)",
-      "Bash(git commit -m 'Add Supabase auth + cross-device sync *)"
+      "Bash(git commit -m 'Add Supabase auth + cross-device sync *)",
+      "Bash(vercel link *)",
+      "Bash(npx vercel *)",
+      "Bash(git commit *)"
     ]
   }
 }
